@@ -3,7 +3,7 @@ services:
     name: flask-api
     env: python
     plan: free
-    branch: dev
+    branch: master
     buildCommand: "pip install -r requerimentos.txt"
     startCommand: "gunicorn app:app"
     autoDeploy: true
