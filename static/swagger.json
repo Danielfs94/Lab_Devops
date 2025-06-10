@@ -1,0 +1,106 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "InovaTech API",
+    "version": "1.0",
+    "description": "Documentação da API do laboratório de criação de APIs"
+  },
+  "host": "localhost:8080",
+  "schemes": ["http"],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Endpoint principal",
+        "description": "Verifica o status da API",
+        "responses": {
+          "200": {
+            "description": "Mensagem de status",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pokemon": {
+      "get": {
+        "summary": "Listar Pokémon",
+        "description": "Retorna uma lista de Pokémon.",
+        "responses": {
+          "200": {
+            "description": "Lista de Pokémon",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "pokemon": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "nome": { "type": "string" },
+                      "tipo": { "type": "string" },
+                      "geracao": { "type": "integer" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Login para gerar token JWT",
+        "description": "Gera um token JWT para autenticação.",
+        "responses": {
+          "200": {
+            "description": "Token de autenticação",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/centro-pokemon": {
+      "get": {
+        "summary": "Centro Pokémon (protegido)",
+        "description": "Acessa o Centro Pokémon. Requer token JWT.",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Acesso permitido à rota protegida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": { "type": "string" }
+              }
+            }
+          },
+          "401": {
+            "description": "Autenticação falhou ou token ausente"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Token JWT no formato: Bearer {token}"
+    }
+  }
+}
