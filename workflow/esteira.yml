@@ -1,0 +1,60 @@
+name: Minha Pokemon API Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pokeball-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout o código
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Construir minha Pokemon API 
+        run: |
+          docker build -t minha-pokemon-api:latest .        
+          docker run --rm minha-pokemon-api:latest echo "Container rodou com sucesso" 
+
+  pokemon-test:
+    needs: pokeball-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout o código
+        uses: actions/checkout@v3               
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Instalar Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
+      - name: Testar minha Pokemon API
+        run: |
+          docker-compose run minha-pokemon-api python -m unittest discover
+
+  pokecenter-deploy:
+    needs: pokemon-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy da minha Pokemon API no Render
+        env:
+          RENDER_API_KEY: ${{ secrets.POKE_CHAVE_SECRETA }}
+          RENDER_SERVICE_ID: ${{ secrets.ID_DEPLOY_POKE_SECRETO }}
+        run: |            
+          curl --request POST \
+          --url https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys \
+          --header "Authorization: Bearer $RENDER_API_KEY" \
+          --header "Content-Type: application/json" \
+          --data '{}'
